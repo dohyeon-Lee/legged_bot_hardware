@@ -1,0 +1,10 @@
+<launch>
+  <group ns="ns1">
+    <node pkg="rosserial_python" type="serial_node.py" name="IMU" >
+    <param name="port" type="string" value="/dev/ttyACM0" />
+    <param name="baud" type="int" value="57600" />
+    </node>
+    <node pkg="legged_bot_hardware" type="legged_bot_hardware_node" name="hardware" />
+  </group>
+
+</launch>
