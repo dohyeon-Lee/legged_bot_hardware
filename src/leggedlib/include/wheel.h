@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include "dynamixel_sdk.h"
+#include <numeric>
 using namespace std;
 
 #define STDIN_FILENO 0
@@ -61,6 +62,8 @@ class wheel
     vector<int> backward(int vel);
     vector<int> spin_cw(int vel);
     vector<int> spin_ccw(int vel);
+    vector<int> roundspin_cw(int vel, double r);
+    vector<int> roundspin_ccw(int vel, double r);
     vector<int> stop();
     vector<int> rest(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *packetHandler, dynamixel::GroupSyncWrite groupSyncWrite);
     vector<int> on(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *packetHandler, dynamixel::GroupSyncWrite groupSyncWrite);

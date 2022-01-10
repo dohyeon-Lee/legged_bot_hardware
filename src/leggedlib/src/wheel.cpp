@@ -21,6 +21,26 @@ vector<int> wheel::spin_ccw(int vel)
     vector<int> speed = {1023+vel,1023+vel,vel,vel};
     return speed;
 }
+vector<int> wheel::roundspin_cw(int vel, double r)
+{
+    double a = 0.175;
+    double b = 0.190;
+    double theta = atan2((b/2.),(r-(a/2.))); //r = 0.4일 때 theta = 16.9
+    double w = double(vel)/r;
+    double v1 = ( (a/2.)/sin(theta) ) * w; //   v1/w = 0.3
+    double v2 = sqrt(pow((r + a/2.), 2)+pow(b/2, 2)) * w;// v2/w = 0.496 
+    vector<int> speed = {int(v2), int(v2), int(v1), int(v1)};
+}
+vector<int> wheel::roundspin_ccw(int vel, double r)
+{
+    double a = 0.175;
+    double b = 0.190;
+    double theta = atan2((b/2.),(r-(a/2.))); //r = 0.4일 때 theta = 16.9
+    double w = double(vel)/r;
+    double v1 = ( (a/2.)/sin(theta) ) * w; //   v1/w = 0.3
+    double v2 = sqrt(pow((r + a/2.), 2)+pow(b/2, 2)) * w;// v2/w = 0.496 
+    vector<int> speed = {int(v1), int(v1), int(v2), int(v2)};
+}
 vector<int> wheel::stop()
 {
     vector<int> speed = {0,0,-1023,-1023};

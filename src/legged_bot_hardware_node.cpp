@@ -335,6 +335,7 @@ void upstair(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *pack
   vector<double> origin = {0,0,1};
   vector<double> angle = body.make_normal_vec(10, 10);
   wheel W;
+  int vel = 500;
   // //수평유지
   // vector<vector<double>> point0 = body.upstair1(origin,l, 0.055);
   // legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point0);
@@ -392,7 +393,7 @@ void upstair(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *pack
   usleep(sec);
   //몸 기울이기(수평유지) & 전진이동
   vector<vector<double>> point7_5 = body.upstair7(origin,l, 0.055);
-  legged_bot.smooth(portHandler, packetHandler,groupSyncWrite, W.forward(100), point7, point7_5);
+  legged_bot.smooth(portHandler, packetHandler,groupSyncWrite, W.forward(vel), point7, point7_5);
   //legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
   usleep(sec);
 
@@ -456,7 +457,7 @@ void upstair(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *pack
   usleep(sec);
   //몸 기울이기(수평유지) & 전진
   vector<vector<double>> point15_5 = body.upstair15(origin,l, 0.055);
-  legged_bot.smooth(portHandler, packetHandler,groupSyncWrite, W.forward(100), point15, point15_5);
+  legged_bot.smooth(portHandler, packetHandler,groupSyncWrite, W.forward(vel), point15, point15_5);
   //legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
   usleep(sec);
   //뒷다리 자세복구
