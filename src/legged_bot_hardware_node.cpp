@@ -91,65 +91,54 @@ int main(int argc, char **argv)
   int l_state = 0;
   int sleep_time = 10000;
 
-  uint8_t dxl_error = 0; 
-  int position[3] = {angle(0), angle(0), angle(M_PI*(7/9.))};         // Goal position
-  packetHandler->write1ByteTxRx(portHandler, DXL_RF0, ADDR_MX_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
-  packetHandler->write1ByteTxRx(portHandler, DXL_RF1, ADDR_MX_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
-  packetHandler->write1ByteTxRx(portHandler, DXL_RF2, ADDR_MX_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
-
-  
-  packetHandler->write2ByteTxRx(portHandler, DXL_RF0, ADDR_MX_GOAL_POSITION, position[0], &dxl_error);
-  packetHandler->write2ByteTxRx(portHandler, DXL_RF1, ADDR_MX_GOAL_POSITION, position[1], &dxl_error);
-  packetHandler->write2ByteTxRx(portHandler, DXL_RF2, ADDR_MX_GOAL_POSITION, position[2], &dxl_error);
-
-  // vector<vector<double>> pbefore = body.plane(origin, 0.13);
-  // vector<vector<double>> pcurrent = body.plane(origin, 0.18);
-  // legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.stop(), pbefore, pcurrent);
-  // while(true)
-  // {
-  //   vector<double> origin = {0,0,1};
+  vector<vector<double>> pbefore = body.plane(origin, 0.13);
+  vector<vector<double>> pcurrent = body.plane(origin, 0.18);
+  legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.stop(), pbefore, pcurrent);
+  while(true)
+  {
+    vector<double> origin = {0,0,1};
     
-  //   if(W.key[1] != 0.0)
-  //   {
-  //     l = 0.14;
-  //     if(l != before_l)
-  //     {
-  //       l_state = 1;
-  //       vector<vector<double>> pointbefore = body.plane(origin, before_l);
-  //       vector<vector<double>> pointcurrent = body.plane(origin, l);
-  //       legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.stop(), pointbefore, pointcurrent);
-  //     }
-  //     else
-  //       l_state = 0;
-  //   }
-  //   else
-  //   {
-  //     l = 0.18;
-  //     if(l != before_l)
-  //     {
-  //       l_state = 1;
-  //       vector<vector<double>> pointbefore = body.plane(origin, before_l);
-  //       vector<vector<double>> pointcurrent = body.plane(origin, l);
-  //       legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.movingwheel(1023), pointbefore, pointcurrent);
-  //     }
-  //     else
-  //       l_state = 0;
-  //   }
-  //   if(W.key[2] == 0.0)
-  //   {
-  //     if(l_state == 0)
-  //     {//point = body.upstair1(origin,l, 0.055);
-  //       point = body.plane(origin, l);
-  //       legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point, W.movingwheel(1023));
-  //     }
-  //   }
-  //   else
-  //   {
-  //     upstair(portHandler, packetHandler, groupSyncWrite,l);
-  //   }
-  //   ros::spinOnce();
-  //   before_l = l;
-  // }
+    if(W.key[1] != 0.0)
+    {
+      l = 0.14;
+      if(l != before_l)
+      {
+        l_state = 1;
+        vector<vector<double>> pointbefore = body.plane(origin, before_l);
+        vector<vector<double>> pointcurrent = body.plane(origin, l);
+        legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.stop(), pointbefore, pointcurrent);
+      }
+      else
+        l_state = 0;
+    }
+    else
+    {
+      l = 0.18;
+      if(l != before_l)
+      {
+        l_state = 1;
+        vector<vector<double>> pointbefore = body.plane(origin, before_l);
+        vector<vector<double>> pointcurrent = body.plane(origin, l);
+        legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.movingwheel(1023), pointbefore, pointcurrent);
+      }
+      else
+        l_state = 0;
+    }
+    if(W.key[2] == 0.0)
+    {
+      if(l_state == 0)
+      {//point = body.upstair1(origin,l, 0.055);
+        point = body.plane(origin, l);
+        legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point, W.movingwheel(1023));
+      }
+    }
+    else
+    {
+      upstair(portHandler, packetHandler, groupSyncWrite,l);
+    }
+    ros::spinOnce();
+    before_l = l;
+  }
 
 //   printf("choose mode\n esc: motor_rest\n1: groundslope_mode\n2: walking_mode\n3: shacking mode\n4: torque mode\n");
 //   if (getch() == ESC_ASCII_VALUE)
