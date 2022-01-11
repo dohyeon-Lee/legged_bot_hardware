@@ -93,6 +93,8 @@ dynamixel_sdk.h
 ../include/dynamixel_sdk.h
 inverse_kinemetics.h
 ../include/inverse_kinemetics.h
+unistd.h
+-
 
 ../include/group_sync_read.h
 map
@@ -195,6 +197,8 @@ cmath
 -
 dynamixel_sdk.h
 ../include/dynamixel_sdk.h
+numeric
+-
 
 /home/ubuntu/catkin_ws/src/legged_bot_hardware/src/leggedlib/src/SerialPort.cpp
 SerialClass.h

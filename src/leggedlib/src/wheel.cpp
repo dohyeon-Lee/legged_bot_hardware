@@ -5,6 +5,11 @@ vector<int> wheel::forward(int vel)
     vector<int> speed = {vel,vel,vel,vel};
     return speed;
 }
+vector<int> wheel::forward_v2(int vel)
+{
+    vector<int> speed = {vel/3,vel,vel,vel/3};
+    return speed;
+}
 vector<int> wheel::backward(int vel)
 {
     vector<int> speed = {1023+vel,1023+vel,vel-1023,vel-1023};
@@ -30,6 +35,7 @@ vector<int> wheel::roundspin_cw(int vel, double r)
     double v1 = ( (a/2.)/sin(theta) ) * w; //   v1/w = 0.3
     double v2 = sqrt(pow((r + a/2.), 2)+pow(b/2, 2)) * w;// v2/w = 0.496 
     vector<int> speed = {int(v2), int(v2), int(v1), int(v1)};
+    return speed;
 }
 vector<int> wheel::roundspin_ccw(int vel, double r)
 {
@@ -40,6 +46,7 @@ vector<int> wheel::roundspin_ccw(int vel, double r)
     double v1 = ( (a/2.)/sin(theta) ) * w; //   v1/w = 0.3
     double v2 = sqrt(pow((r + a/2.), 2)+pow(b/2, 2)) * w;// v2/w = 0.496 
     vector<int> speed = {int(v1), int(v1), int(v2), int(v2)};
+    return speed;
 }
 vector<int> wheel::stop()
 {
@@ -76,9 +83,9 @@ vector<int> wheel::movingwheel(int vel)
     else if(key[0] < 0)
         speed = backward(vel/2);
     if(key[1] > 0)
-        speed = spin_cw(vel/4);
+        speed = roundspin_ccw(vel/2, 0.2);
     else if(key[1] < 0)
-        speed = spin_ccw(vel/4);
+        speed = roundspin_cw(vel/2, 0.2);
     if(key[0] == 0.0 && key[1] == 0.0)
         speed = stop();
     return speed;

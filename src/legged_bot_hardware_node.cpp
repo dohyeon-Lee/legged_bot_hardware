@@ -59,6 +59,15 @@ void signalHandler( int signum );
 //입력함수
 int getch();
 
+
+double fmap(double x, double in_min, double in_max, double out_min, double out_max)
+{
+    return (x - in_min)*(out_max - out_min) / (in_max - in_min) + out_min;
+}
+int angle(double angle_)
+{
+    return fmap(angle_, -M_PI/2, M_PI/2, 205, 819);
+}
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "legged_bot_hardware");
@@ -75,57 +84,72 @@ int main(int argc, char **argv)
   vector<double> normal = {0,0.3,1}; //for plane & groundslope
 
   int data = 0;
-  double l = 0.17;
+  double l = 0.18;
   double before_l = l;
   vector<vector<double>> point;
-  
+  vector<double> origin = {0,0,1};
   int l_state = 0;
   int sleep_time = 10000;
-  while(true)
-  {
-    vector<double> origin = {0,0,1};
+
+  uint8_t dxl_error = 0; 
+  int position[3] = {angle(0), angle(0), angle(M_PI*(7/9.))};         // Goal position
+  packetHandler->write1ByteTxRx(portHandler, DXL_RF0, ADDR_MX_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
+  packetHandler->write1ByteTxRx(portHandler, DXL_RF1, ADDR_MX_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
+  packetHandler->write1ByteTxRx(portHandler, DXL_RF2, ADDR_MX_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
+
+  
+  packetHandler->write2ByteTxRx(portHandler, DXL_RF0, ADDR_MX_GOAL_POSITION, position[0], &dxl_error);
+  packetHandler->write2ByteTxRx(portHandler, DXL_RF1, ADDR_MX_GOAL_POSITION, position[1], &dxl_error);
+  packetHandler->write2ByteTxRx(portHandler, DXL_RF2, ADDR_MX_GOAL_POSITION, position[2], &dxl_error);
+
+  // vector<vector<double>> pbefore = body.plane(origin, 0.13);
+  // vector<vector<double>> pcurrent = body.plane(origin, 0.18);
+  // legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.stop(), pbefore, pcurrent);
+  // while(true)
+  // {
+  //   vector<double> origin = {0,0,1};
     
-    if(W.key[1] != 0.0)
-    {
-      l = 0.14;
-      if(l != before_l)
-      {
-        l_state = 1;
-        vector<vector<double>> pointbefore = body.plane(origin, before_l);
-        vector<vector<double>> pointcurrent = body.plane(origin, l);
-        legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.movingwheel(1023), pointbefore, pointcurrent);
-      }
-      else
-        l_state = 0;
-    }
-    else
-    {
-      l = 0.17;
-      if(l != before_l)
-      {
-        l_state = 1;
-        vector<vector<double>> pointbefore = body.plane(origin, before_l);
-        vector<vector<double>> pointcurrent = body.plane(origin, l);
-        legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.movingwheel(1023), pointbefore, pointcurrent);
-      }
-      else
-        l_state = 0;
-    }
-    if(W.key[2] == 0.0)
-    {
-      if(l_state = 0)
-      {//point = body.upstair1(origin,l, 0.055);
-        point = body.plane(origin, l);
-        legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point, W.movingwheel(1023));
-      }
-    }
-    else
-    {
-      upstair(portHandler, packetHandler, groupSyncWrite,l);
-    }
-    ros::spinOnce();
-    before_l = l;
-  }
+  //   if(W.key[1] != 0.0)
+  //   {
+  //     l = 0.14;
+  //     if(l != before_l)
+  //     {
+  //       l_state = 1;
+  //       vector<vector<double>> pointbefore = body.plane(origin, before_l);
+  //       vector<vector<double>> pointcurrent = body.plane(origin, l);
+  //       legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.stop(), pointbefore, pointcurrent);
+  //     }
+  //     else
+  //       l_state = 0;
+  //   }
+  //   else
+  //   {
+  //     l = 0.18;
+  //     if(l != before_l)
+  //     {
+  //       l_state = 1;
+  //       vector<vector<double>> pointbefore = body.plane(origin, before_l);
+  //       vector<vector<double>> pointcurrent = body.plane(origin, l);
+  //       legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.movingwheel(1023), pointbefore, pointcurrent);
+  //     }
+  //     else
+  //       l_state = 0;
+  //   }
+  //   if(W.key[2] == 0.0)
+  //   {
+  //     if(l_state == 0)
+  //     {//point = body.upstair1(origin,l, 0.055);
+  //       point = body.plane(origin, l);
+  //       legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point, W.movingwheel(1023));
+  //     }
+  //   }
+  //   else
+  //   {
+  //     upstair(portHandler, packetHandler, groupSyncWrite,l);
+  //   }
+  //   ros::spinOnce();
+  //   before_l = l;
+  // }
 
 //   printf("choose mode\n esc: motor_rest\n1: groundslope_mode\n2: walking_mode\n3: shacking mode\n4: torque mode\n");
 //   if (getch() == ESC_ASCII_VALUE)
@@ -331,15 +355,15 @@ int main(int argc, char **argv)
 
 void upstair(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *packetHandler, dynamixel::GroupSyncWrite groupSyncWrite,  double l)
 {
-  int sec = 1000000;
+  int sec = 10000;
   vector<double> origin = {0,0,1};
   vector<double> angle = body.make_normal_vec(10, 10);
   wheel W;
   int vel = 500;
-  // //수평유지
-  // vector<vector<double>> point0 = body.upstair1(origin,l, 0.055);
-  // legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point0);
-  // usleep(sec);
+  //수평유지
+  vector<vector<double>> point0 = body.upstair1(origin,l, 0.055);
+  legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point0);
+  usleep(sec);
 
   /*RB*/
   //몸 기울이기
@@ -393,9 +417,9 @@ void upstair(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *pack
   usleep(sec);
   //몸 기울이기(수평유지) & 전진이동
   vector<vector<double>> point7_5 = body.upstair7(origin,l, 0.055);
-  legged_bot.smooth(portHandler, packetHandler,groupSyncWrite, W.forward(vel), point7, point7_5);
+  legged_bot.smooth(portHandler, packetHandler,groupSyncWrite, W.forward(vel), point7, point7_5);//W.forward(vel)
   //legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
-  usleep(sec);
+  usleep(1000000);
 
   //앞다리 자세복구
   vector<vector<double>> point8 = body.upstair8(origin,l, 0.055);
@@ -433,7 +457,7 @@ void upstair(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *pack
   usleep(sec);
 
   /*LF*/
-  angle = body.make_normal_vec(-10, -10); //다른 방향으로 기울이기
+  angle = body.make_normal_vec(-16, -16); //다른 방향으로 기울이기
 
   //기울이기
   vector<vector<double>> point12_55 = body.upstair12(angle,l, 0.055);
@@ -456,13 +480,13 @@ void upstair(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *pack
   //legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
   usleep(sec);
   //몸 기울이기(수평유지) & 전진
-  vector<vector<double>> point15_5 = body.upstair15(origin,l, 0.055);
-  legged_bot.smooth(portHandler, packetHandler,groupSyncWrite, W.forward(vel), point15, point15_5);
+  vector<vector<double>> point15_5 = body.upstair15(origin,l+0.02, 0.055);
+  legged_bot.smooth(portHandler, packetHandler,groupSyncWrite, W.forward_v2(vel/2), point15, point15_5);
   //legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
   usleep(sec);
-  //뒷다리 자세복구
+  //뒷다리 자세복구 & 전진
   vector<vector<double>> point16 = body.upstair16(origin,l, 0.055);
-  legged_bot.smooth(portHandler, packetHandler,groupSyncWrite, W.stop(), point15_5, point16);
+  legged_bot.smooth(portHandler, packetHandler,groupSyncWrite, W.forward_v2(vel/2), point15_5, point16);
   //legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
   usleep(sec);
 

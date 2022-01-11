@@ -16,7 +16,7 @@ double group_motor_control::fmap(double x, double in_min, double in_max, double 
 
 int group_motor_control::angle(double angle_)
 {
-    return fmap(angle_, -M_PI/2, M_PI/2, 205, 819);
+    return fmap(angle_, -M_PI/2, M_PI/2, 205, 819);//+-90도
 }
 
 int group_motor_control::getch()
@@ -355,14 +355,14 @@ void group_motor_control::smooth(dynamixel::PortHandler *portHandler, dynamixel:
         for(int j = 0; j < 3; j++)
             errorpoint[i][j] = current_point[i][j] - before_point[i][j];
 
-    double moving_speed = 100.0;
+    double moving_speed = 1000.0;
     for(int k = 0; k < int(moving_speed); k++)
     {
         for(int i = 0; i < 4; i++)
             for(int j = 0; j < 3; j++)
                 point[i][j] = point[i][j] + double(errorpoint[i][j])/moving_speed;
         moving(portHandler, packetHandler, groupSyncWrite ,point, wheelspeed);
-        usleep(100000);//100 millisecond
+        usleep(1000);//1 millisecond
     }
 }
 

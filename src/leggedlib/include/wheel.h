@@ -59,6 +59,7 @@ class wheel
     public:
     vector<double> key = {0,0,0};
     vector<int> forward(int vel);
+    vector<int> forward_v2(int vel);
     vector<int> backward(int vel);
     vector<int> spin_cw(int vel);
     vector<int> spin_ccw(int vel);

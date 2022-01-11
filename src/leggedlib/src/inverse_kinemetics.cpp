@@ -317,7 +317,7 @@ vector<vector<double>> IK::upstair1(vector<double> normal, double l, double a)
 
     double RBt = dot(sub(p,RB0),n)/dot(z,n);
     vector<double> RB1 = add(RB0, multiply(z,RBt));
-
+    
     vector<vector<double>> points = {RF1, LF1, LB1, RB1};
     return points;
 }
@@ -450,6 +450,7 @@ vector<vector<double>> IK::upstair4(vector<double> normal, double l, double a)
 }
 vector<vector<double>> IK::upstair5(vector<double> normal, double l, double a)
 {
+    vector<double> delta_x = {-0.08,0,0};
     //about body length
     double LFx = 0.075; //190/2 * 0.001
     double LFy = 0.059;//118/2 * 0.001
@@ -470,7 +471,9 @@ vector<vector<double>> IK::upstair5(vector<double> normal, double l, double a)
     vector<double> p = multiply(z,-l);
 
     double b = a/n[2];
+    double c = 0.02/n[2];
     vector<double> zb = {0,0,b};
+    vector<double> zc = {0,0,-c};
 
     double LFt = dot(sub(p,LF0),n)/dot(z,n);
     vector<double> LF1 = add(LF0, multiply(z,LFt));
@@ -481,11 +484,12 @@ vector<vector<double>> IK::upstair5(vector<double> normal, double l, double a)
     double LBt = dot(sub(p,LB0),n)/dot(z,n);
     vector<double> LB1 = add(LB0, multiply(z,LBt));
     vector<double> LB2 = add(LB1, zb);
-    double RBt = dot(sub(p,RB0),n)/dot(z,n);
+    double RBt = dot(sub(sub(p,RB0),delta_x),n)/dot(z,n);
     vector<double> RB1 = add(RB0, multiply(z,RBt));
-    vector<double> RB2 = add(RB1, zb);
+    vector<double> RB3 = add(add(RB1, zb),delta_x);
+    vector<double> RB4 = add(add(add(RB1, zb),delta_x),zc);
 
-    vector<vector<double>> points = {RF1, LF1, LB2, RB2};
+    vector<vector<double>> points = {RF1, LF1, LB2, RB4};
     return points;
 }
 
@@ -512,8 +516,9 @@ vector<vector<double>> IK::upstair6(vector<double> normal, double l, double a)
     vector<double> p = multiply(z,-l);
 
     double b = a/n[2];
+    double c = 0.02/n[2];
     vector<double> zb = {0,0,b};
-
+    vector<double> zc = {0,0,-c};
     double LFt = dot(sub(p,LF0),n)/dot(z,n);
     vector<double> LF1 = add(LF0, multiply(z,LFt));
 
@@ -526,9 +531,10 @@ vector<vector<double>> IK::upstair6(vector<double> normal, double l, double a)
     double RBt = dot(sub(sub(p,RB0),delta_x),n)/dot(z,n);
     vector<double> RB1 = add(RB0, multiply(z,RBt));
     vector<double> RB3 = add(add(RB1, zb),delta_x);
+    vector<double> RB4 = add(add(add(RB1, zb),delta_x),zc);
 
 
-    vector<vector<double>> points = {RF1, LF1, LB3, RB3};
+    vector<vector<double>> points = {RF1, LF1, LB3, RB4};
     return points;
 }
 vector<vector<double>> IK::upstair7(vector<double> normal, double l, double a)
@@ -613,12 +619,12 @@ vector<vector<double>> IK::upstair8(vector<double> normal, double l, double a)
     vector<double> LB1 = add(LB0, multiply(z,LBt));
     vector<double> LB5 = add(add(LB1, zb),zc);
 
-    double RBt = dot(sub(p,LB0),n)/dot(z,n);
+    double RBt = dot(sub(p,RB0),n)/dot(z,n);
     vector<double> RB1 = add(RB0, multiply(z,RBt));
     vector<double> RB5 = add(add(RB1, zb),zc);
 
     vector<vector<double>> points = {RF1, LF1, LB5, RB5};
-    return points;
+     return points;
 }
 
 vector<vector<double>> IK::upstair10(vector<double> normal, double l, double a)
@@ -658,7 +664,7 @@ vector<vector<double>> IK::upstair10(vector<double> normal, double l, double a)
     vector<double> LB1 = add(LB0, multiply(z,LBt));
     vector<double> LB5 = add(add(LB1, zb),zc);
 
-    double RBt = dot(sub(p,LB0),n)/dot(z,n);
+    double RBt = dot(sub(p,RB0),n)/dot(z,n);
     vector<double> RB1 = add(RB0, multiply(z,RBt));
     vector<double> RB5 = add(add(RB1, zb),zc);
 
@@ -668,7 +674,7 @@ vector<vector<double>> IK::upstair10(vector<double> normal, double l, double a)
 
 vector<vector<double>> IK::upstair11(vector<double> normal, double l, double a)
 {
-    vector<double> delta_x = {-0.08,0,0};
+    vector<double> delta_x = {-0.02,0,0};
     //about body length
     double LFx = 0.075; //190/2 * 0.001
     double LFy = 0.059;//118/2 * 0.001
@@ -703,7 +709,7 @@ vector<vector<double>> IK::upstair11(vector<double> normal, double l, double a)
     vector<double> LB1 = add(LB0, multiply(z,LBt));
     vector<double> LB5 = add(add(LB1, zb),zc);
 
-    double RBt = dot(sub(p,LB0),n)/dot(z,n);
+    double RBt = dot(sub(p,RB0),n)/dot(z,n);
     vector<double> RB1 = add(RB0, multiply(z,RBt));
     vector<double> RB5 = add(add(RB1, zb),zc);
 
@@ -713,7 +719,7 @@ vector<vector<double>> IK::upstair11(vector<double> normal, double l, double a)
 
 vector<vector<double>> IK::upstair12(vector<double> normal, double l, double a)
 {
-    vector<double> delta_x = {-0.08,0,0};
+    vector<double> delta_x = {-0.02,0,0};
     //about body length
     double LFx = 0.075; //190/2 * 0.001
     double LFy = 0.059;//118/2 * 0.001
@@ -749,7 +755,7 @@ vector<vector<double>> IK::upstair12(vector<double> normal, double l, double a)
     vector<double> LB1 = add(LB0, multiply(z,LBt));
     vector<double> LB5 = add(add(LB1, zb),zc);
 
-    double RBt = dot(sub(p,LB0),n)/dot(z,n);
+    double RBt = dot(sub(p,RB0),n)/dot(z,n);
     vector<double> RB1 = add(RB0, multiply(z,RBt));
     vector<double> RB5 = add(add(RB1, zb),zc);
 
@@ -759,7 +765,7 @@ vector<vector<double>> IK::upstair12(vector<double> normal, double l, double a)
 
 vector<vector<double>> IK::upstair13(vector<double> normal, double l, double a)
 {
-    vector<double> delta_x = {-0.08,0,0};
+    vector<double> delta_x = {-0.02,0,0};
     //about body length
     double LFx = 0.075; //190/2 * 0.001
     double LFy = 0.059;//118/2 * 0.001
@@ -796,7 +802,7 @@ vector<vector<double>> IK::upstair13(vector<double> normal, double l, double a)
     vector<double> LB1 = add(LB0, multiply(z,LBt));
     vector<double> LB5 = add(add(LB1, zb),zc);
 
-    double RBt = dot(sub(p,LB0),n)/dot(z,n);
+    double RBt = dot(sub(p,RB0),n)/dot(z,n);
     vector<double> RB1 = add(RB0, multiply(z,RBt));
     vector<double> RB5 = add(add(RB1, zb),zc);
 
@@ -806,7 +812,7 @@ vector<vector<double>> IK::upstair13(vector<double> normal, double l, double a)
 
 vector<vector<double>> IK::upstair14(vector<double> normal, double l, double a)
 {
-    vector<double> delta_x = {-0.08,0,0};
+    vector<double> delta_x = {-0.02,0,0};
     //about body length
     double LFx = 0.075; //190/2 * 0.001
     double LFy = 0.059;//118/2 * 0.001
@@ -843,7 +849,7 @@ vector<vector<double>> IK::upstair14(vector<double> normal, double l, double a)
     vector<double> LB1 = add(LB0, multiply(z,LBt));
     vector<double> LB5 = add(add(LB1, zb),zc);
 
-    double RBt = dot(sub(p,LB0),n)/dot(z,n);
+    double RBt = dot(sub(p,RB0),n)/dot(z,n);
     vector<double> RB1 = add(RB0, multiply(z,RBt));
     vector<double> RB5 = add(add(RB1, zb),zc);
 
@@ -853,7 +859,7 @@ vector<vector<double>> IK::upstair14(vector<double> normal, double l, double a)
 
 vector<vector<double>> IK::upstair15(vector<double> normal, double l, double a)
 {
-    vector<double> delta_x = {-0.08,0,0};
+    vector<double> delta_x = {-0.02,0,0};
     //about body length
     double LFx = 0.075; //190/2 * 0.001
     double LFy = 0.059;//118/2 * 0.001
@@ -891,7 +897,7 @@ vector<vector<double>> IK::upstair15(vector<double> normal, double l, double a)
     vector<double> LB1 = add(LB0, multiply(z,LBt));
     vector<double> LB5 = add(add(LB1, zb),zc);
 
-    double RBt = dot(sub(p,LB0),n)/dot(z,n);
+    double RBt = dot(sub(p,RB0),n)/dot(z,n);
     vector<double> RB1 = add(RB0, multiply(z,RBt));
     vector<double> RB5 = add(add(RB1, zb),zc);
 
@@ -901,7 +907,7 @@ vector<vector<double>> IK::upstair15(vector<double> normal, double l, double a)
 
 vector<vector<double>> IK::upstair16(vector<double> normal, double l, double a)
 {
-    vector<double> delta_x = {-0.08,0,0};
+    vector<double> delta_x = {-0.02,0,0};
     //about body length
     double LFx = 0.075; //190/2 * 0.001
     double LFy = 0.059;//118/2 * 0.001
@@ -937,7 +943,7 @@ vector<vector<double>> IK::upstair16(vector<double> normal, double l, double a)
     vector<double> LB1 = add(LB0, multiply(z,LBt));
     vector<double> LB5 = add(add(LB1, zb),zc);
 
-    double RBt = dot(sub(p,LB0),n)/dot(z,n);
+    double RBt = dot(sub(p,RB0),n)/dot(z,n);
     vector<double> RB1 = add(RB0, multiply(z,RBt));
     vector<double> RB5 = add(add(RB1, zb),zc);
 
