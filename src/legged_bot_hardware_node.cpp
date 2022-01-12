@@ -58,22 +58,16 @@ void upstair(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *pack
 void signalHandler( int signum );
 //입력함수
 int getch();
+//balancing 함수
+vector<vector<double>> balancing(double &anglex, double &angley, double &angle_x, double &angle_y, double l, IK *body, action *act);
 
-
-double fmap(double x, double in_min, double in_max, double out_min, double out_max)
-{
-    return (x - in_min)*(out_max - out_min) / (in_max - in_min) + out_min;
-}
-int angle(double angle_)
-{
-    return fmap(angle_, -M_PI/2, M_PI/2, 205, 819);
-}
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "legged_bot_hardware");
   ros::NodeHandle nh;
   ros::Subscriber sub = nh.subscribe("cmd_vel", 1000, Callback_KEY);
-  
+  ros::Subscriber IMU = nh.subscribe("ANGLE",1000, Callback_IMU);
+
   //dynamixel setting
   dynamixel::PortHandler *portHandler = dynamixel::PortHandler::getPortHandler(DEVICENAME);
   dynamixel::PacketHandler *packetHandler = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION);
@@ -94,10 +88,28 @@ int main(int argc, char **argv)
   vector<vector<double>> pbefore = body.plane(origin, 0.13);
   vector<vector<double>> pcurrent = body.plane(origin, 0.18);
   legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.stop(), pbefore, pcurrent);
+
+  /*balancing mode setting*/
+  legged_bot.setting(portHandler, packetHandler, groupSyncWrite);
+  
+  double angle_x;
+  double angle_y;
+
+  //PID control
+  double PID_x;
+  double PID_y;
+  act.groundslopePID_pre_setting();
+  // while(1)
+  // {
+  //   point = balancing(anglex, angley, angle_x, angle_y, l, &body, &act);
+  //   legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
+  //   usleep(sleep_time);
+  //   ros::spinOnce();
+  // }
   while(true)
   {
     vector<double> origin = {0,0,1};
-    
+    point = balancing(anglex, angley, angle_x, angle_y, l, &body, &act);
     if(W.key[1] != 0.0)
     {
       l = 0.14;
@@ -128,7 +140,7 @@ int main(int argc, char **argv)
     {
       if(l_state == 0)
       {//point = body.upstair1(origin,l, 0.055);
-        point = body.plane(origin, l);
+        
         legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point, W.movingwheel(1023));
       }
     }
@@ -136,54 +148,10 @@ int main(int argc, char **argv)
     {
       upstair(portHandler, packetHandler, groupSyncWrite,l);
     }
+    usleep(sleep_time);
     ros::spinOnce();
     before_l = l;
   }
-
-//   printf("choose mode\n esc: motor_rest\n1: groundslope_mode\n2: walking_mode\n3: shacking mode\n4: torque mode\n");
-//   if (getch() == ESC_ASCII_VALUE)
-//   {
-//     legged_bot.rest(portHandler, packetHandler, groupSyncWrite);
-//     return 0; 
-//   }
-
-//   else if (getch() == 49) //groundslope mode
-//   {
-    
-//     ros::Subscriber IMU = nh.subscribe("ANGLE",1000, Callback_IMU);
-//     legged_bot.setting(portHandler, packetHandler, groupSyncWrite);
-//      //groundslope
-    
-//     double angle_x;
-//     double angle_y;
-
-//     //PID control
-//     double PID_x;
-//     double PID_y;
-//     act.groundslopePID_pre_setting();
-//     while(1)
-//     {
-      
-      
-//       //about serial
-//       //serial.readangles(serial_port, &anglex, &angley);
-//       if(anglex != -1 && angley != -1 && anglex <= 180 && anglex >= -180 && angley <= 180 && angley >= -180)
-//       {
-//         angle_x = anglex;
-//         angle_y = angley;
-//       }
-//       std::cout << angle_x <<","<< angle_y <<std::endl;
-//       vector<double> goal = {0,0};
-//       vector<double> PID = act.groundslopePID(goal, angle_x, angle_y);
-//       if(PID[2] > 0.5)
-//         return 0;
-//       vector<double> angle = body.aaa(PID[0], PID[1]);
-//       point = body.groundslope(angle,l);
-//       legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
-//       usleep(sleep_time);
-//       ros::spinOnce();
-//     }
-//   }
 
 //   else if (getch() == 50){ //walking mode
 //     legged_bot.setting(portHandler, packetHandler, groupSyncWrite);
@@ -298,45 +266,6 @@ int main(int argc, char **argv)
 
 //     }
 
-//   }
- 
-//   else if (getch() == 52) //torque mode
-//   {
-//     torque.setting(portHandler, packetHandler, groupSyncWrite);
-//     while(1)
-//     {
-//       torque.moving(portHandler, packetHandler, groupSyncWrite);
-//     }
-//   }
-
-//   else if (getch() == 53) //upstair mode
-//   {
-//     vector<double> origin = {0,0,1};
-//     vector<double> angle = body.make_normal_vec(10, 10);
-//     wheel W;
-//     point = body.upstair1(origin,l, 0.055);
-//     legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point, W.stop());
-//     usleep(sleep_time * 10000);
-
-//     point = body.upstair1(angle,l, 0.055);
-//     legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
-//     usleep(sleep_time * 100);
-    
-//     point = body.upstair2(angle,l, 0.055);
-//     legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
-//     usleep(sleep_time * 100);
-
-//     point = body.upstair3(angle,l, 0.055);
-//     legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
-//     usleep(sleep_time * 100);
-
-//     point = body.upstair4(angle,l, 0.065);
-//     legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
-//     usleep(sleep_time * 100);
-
-//     point = body.upstair4(origin,l, 0.065);
-//     legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
-//     usleep(sleep_time * 100);
 //   }
 
   return 0;
@@ -484,7 +413,51 @@ void upstair(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *pack
   legged_bot.smooth(portHandler, packetHandler,groupSyncWrite, W.stop(), point16, point17);
   //legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
 }
+vector<vector<double>> balancing(double &anglex, double &angley, double &angle_x, double &angle_y, double l, IK *body, action *act)
+{
+  int limit_angle = 15;
+  if(anglex != -1 && angley != -1 && anglex <= 180 && anglex >= -180 && angley <= 180 && angley >= -180)
+  {
+    angle_x = anglex;
+    angle_y = angley;
+  }
 
+  // if(angle_y > limit_angle)
+  //   angle_y = limit_angle;
+  // else if(angle_y < -limit_angle)
+  //   angle_y = -limit_angle;
+  // else 
+  //   angle_y = angle_y;
+
+  // if(angle_x > limit_angle)
+  //   angle_x = limit_angle;
+  // else if(angle_x < -limit_angle)
+  //   angle_x = -limit_angle;
+  // else 
+  //   angle_x = angle_x;
+
+  std::cout << angle_x <<","<< angle_y <<std::endl;
+  vector<double> goal = {0,0};
+  vector<double> PID = act->groundslopePID(goal, angle_x, angle_y);
+  
+  if(PID[0] > 15)
+    PID[0] = 15;
+  else if(PID[0] < -15)
+    PID[0] = -15;
+  else 
+    PID[0] = PID[0];
+
+  if(PID[1] > 15)
+    PID[1] = 15;
+  else if(PID[1] < -15)
+    PID[1] = -15;
+  else 
+    PID[1] = PID[1];
+
+  vector<double> angle = body->aaa(PID[0], PID[1]);
+  vector<vector<double>> point = body->groundslope(angle,l);
+  return point;
+}
 void signalHandler( int signum ) 
 {
   close(serial_port);

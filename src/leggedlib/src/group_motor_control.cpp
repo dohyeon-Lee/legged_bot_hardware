@@ -188,11 +188,100 @@ void group_motor_control::moving(dynamixel::PortHandler *portHandler, dynamixel:
     vector<double> leg3 = ik.IK_LB(point[2][0], point[2][1], point[2][2]);
     vector<double> leg4 = ik.IK_RB(point[3][0], point[3][1], point[3][2]);
     
-    int position1[3] = {angle(leg1[0]),angle(-leg1[1]),angle(-leg1[2])};
-    int position2[3] = {angle(leg2[0]),angle(-leg2[1]),angle(-leg2[2])};
-    int position3[3] = {angle(leg3[0]),angle(-leg3[1]),angle(-leg3[2])};
-    int position4[3] = {angle(leg4[0]),angle(-leg4[1]),angle(-leg4[2])};
+    int pposition1[3] = {angle(leg1[0]),angle(-leg1[1]),angle(-leg1[2])}; //RF
+    int pposition2[3] = {angle(leg2[0]),angle(-leg2[1]),angle(-leg2[2])}; //LF
+    int pposition3[3] = {angle(leg3[0]),angle(-leg3[1]),angle(-leg3[2])}; //LB
+    int pposition4[3] = {angle(leg4[0]),angle(-leg4[1]),angle(-leg4[2])}; //RB
+
+    int position1[3];
+    int position2[3];
+    int position3[3];
+    int position4[3];
+    //RF
+    if(pposition1[0] > angle(M_PI/3.))
+        position1[0] = angle(M_PI/3.);
+    else if(pposition1[0] < angle(-M_PI/3.))
+        position1[0] = angle(-M_PI/3.);
+    else
+        position1[0] = pposition1[0];
     
+    if(pposition1[1] > angle(M_PI/2.))
+        position1[1] = angle(M_PI/2.);
+    else if(pposition1[1] < angle(-M_PI/3.))
+        position1[1] = angle(-M_PI/3.);
+    else
+        position1[1] = pposition1[1];
+    
+    if(pposition1[2] > angle(M_PI*(7./9.)))
+        position1[2] = angle(M_PI*(7./9.));
+    else if(pposition1[2] < angle(0))
+        position1[2] = angle(0);
+    else
+        position1[2] = pposition1[2];
+    //LF
+    if(pposition2[0] > angle(M_PI/3.))
+        position2[0] = angle(M_PI/3.);
+    else if(pposition2[0] < angle(-M_PI/3.))
+        position2[0] = angle(-M_PI/3.);
+    else
+        position2[0] = pposition2[0];
+    
+    if(pposition2[1] > angle(M_PI/2.))
+        position2[1] = angle(M_PI/2.);
+    else if(pposition2[1] < angle(-M_PI/3.))
+        position2[1] = angle(-M_PI/3.);
+    else
+        position2[1] = pposition2[1];
+    
+    if(pposition2[2] > angle(M_PI*(7./9.)))
+        position2[2] = angle(M_PI*(7./9.));
+    else if(pposition2[2] < angle(0))
+        position2[2] = angle(0);
+    else
+        position2[2] = pposition2[2];
+    //LB
+    if(pposition3[0] > angle(M_PI/3.))
+        position3[0] = angle(M_PI/3.);
+    else if(pposition3[0] < angle(-M_PI/3.))
+        position3[0] = angle(-M_PI/3.);
+    else
+        position3[0] = pposition3[0];
+    
+    if(pposition3[1] > angle(M_PI/2.))
+        position3[1] = angle(M_PI/2.);
+    else if(pposition3[1] < angle(-M_PI/3.))
+        position3[1] = angle(-M_PI/3.);
+    else
+        position3[1] = pposition3[1];
+    
+    if(pposition3[2] > angle(M_PI*(7./9.)))
+        position3[2] = angle(M_PI*(7./9.));
+    else if(pposition3[2] < angle(0))
+        position3[2] = angle(0);
+    else
+        position3[2] = pposition3[2];
+    //RB
+    if(pposition4[0] > angle(M_PI/3.))
+        position4[0] = angle(M_PI/3.);
+    else if(pposition4[0] < angle(-M_PI/3.))
+        position4[0] = angle(-M_PI/3.);
+    else
+        position4[0] = pposition4[0];
+    
+    if(pposition4[1] > angle(M_PI/2.))
+        position4[1] = angle(M_PI/2.);
+    else if(pposition4[1] < angle(-M_PI/3.))
+        position4[1] = angle(-M_PI/3.);
+    else
+        position4[1] = pposition4[1];
+    
+    if(pposition4[2] > angle(M_PI*(7./9.)))
+        position4[2] = angle(M_PI*(7./9.));
+    else if(pposition4[2] < angle(0))
+        position4[2] = angle(0);
+    else
+        position4[2] = pposition4[2];
+
     int speed1[3] = {speed,speed,speed};
     int speed2[3] = {speed,speed,speed};
     int speed3[3] = {speed,speed,speed};
@@ -379,10 +468,100 @@ void group_motor_control::moving(dynamixel::PortHandler *portHandler, dynamixel:
     vector<double> leg3 = ik.IK_LB(point[2][0], point[2][1], point[2][2]);
     vector<double> leg4 = ik.IK_RB(point[3][0], point[3][1], point[3][2]);
     
-    int position1[3] = {angle(leg1[0]),angle(-leg1[1]),angle(-leg1[2])};
-    int position2[3] = {angle(leg2[0]),angle(-leg2[1]),angle(-leg2[2])};
-    int position3[3] = {angle(leg3[0]),angle(-leg3[1]),angle(-leg3[2])};
-    int position4[3] = {angle(leg4[0]),angle(-leg4[1]),angle(-leg4[2])};
+    int pposition1[3] = {angle(leg1[0]),angle(-leg1[1]),angle(-leg1[2])}; //RF
+    int pposition2[3] = {angle(leg2[0]),angle(-leg2[1]),angle(-leg2[2])}; //LF
+    int pposition3[3] = {angle(leg3[0]),angle(-leg3[1]),angle(-leg3[2])}; //LB
+    int pposition4[3] = {angle(leg4[0]),angle(-leg4[1]),angle(-leg4[2])}; //RB
+
+    int position1[3];
+    int position2[3];
+    int position3[3];
+    int position4[3];
+    //RF
+    if(pposition1[0] > angle(M_PI/3.))
+        position1[0] = angle(M_PI/3.);
+    else if(pposition1[0] < angle(-M_PI/3.))
+        position1[0] = angle(-M_PI/3.);
+    else
+        position1[0] = pposition1[0];
+    
+    if(pposition1[1] > angle(M_PI/2.))
+        position1[1] = angle(M_PI/2.);
+    else if(pposition1[1] < angle(-M_PI/3.))
+        position1[1] = angle(-M_PI/3.);
+    else
+        position1[1] = pposition1[1];
+    
+    if(pposition1[2] > angle(M_PI*(7./9.)))
+        position1[2] = angle(M_PI*(7./9.));
+    else if(pposition1[2] < angle(0))
+        position1[2] = angle(0);
+    else
+        position1[2] = pposition1[2];
+    //LF
+    if(pposition2[0] > angle(M_PI/3.))
+        position2[0] = angle(M_PI/3.);
+    else if(pposition2[0] < angle(-M_PI/3.))
+        position2[0] = angle(-M_PI/3.);
+    else
+        position2[0] = pposition2[0];
+    
+    if(pposition2[1] > angle(M_PI/2.))
+        position2[1] = angle(M_PI/2.);
+    else if(pposition2[1] < angle(-M_PI/3.))
+        position2[1] = angle(-M_PI/3.);
+    else
+        position2[1] = pposition2[1];
+    
+    if(pposition2[2] > angle(M_PI*(7./9.)))
+        position2[2] = angle(M_PI*(7./9.));
+    else if(pposition2[2] < angle(0))
+        position2[2] = angle(0);
+    else
+        position2[2] = pposition2[2];
+    //LB
+    if(pposition3[0] > angle(M_PI/3.))
+        position3[0] = angle(M_PI/3.);
+    else if(pposition3[0] < angle(-M_PI/3.))
+        position3[0] = angle(-M_PI/3.);
+    else
+        position3[0] = pposition3[0];
+    
+    if(pposition3[1] > angle(M_PI/2.))
+        position3[1] = angle(M_PI/2.);
+    else if(pposition3[1] < angle(-M_PI/3.))
+        position3[1] = angle(-M_PI/3.);
+    else
+        position3[1] = pposition3[1];
+    
+    if(pposition3[2] > angle(M_PI*(7./9.)))
+        position3[2] = angle(M_PI*(7./9.));
+    else if(pposition3[2] < angle(0))
+        position3[2] = angle(0);
+    else
+        position3[2] = pposition3[2];
+    //RB
+    if(pposition4[0] > angle(M_PI/3.))
+        position4[0] = angle(M_PI/3.);
+    else if(pposition4[0] < angle(-M_PI/3.))
+        position4[0] = angle(-M_PI/3.);
+    else
+        position4[0] = pposition4[0];
+    
+    if(pposition4[1] > angle(M_PI/2.))
+        position4[1] = angle(M_PI/2.);
+    else if(pposition4[1] < angle(-M_PI/3.))
+        position4[1] = angle(-M_PI/3.);
+    else
+        position4[1] = pposition4[1];
+    
+    if(pposition4[2] > angle(M_PI*(7./9.)))
+        position4[2] = angle(M_PI*(7./9.));
+    else if(pposition4[2] < angle(0))
+        position4[2] = angle(0);
+    else
+        position4[2] = pposition4[2];
+
     
     int speed1[3] = {speed,speed,speed};
     int speed2[3] = {speed,speed,speed};
