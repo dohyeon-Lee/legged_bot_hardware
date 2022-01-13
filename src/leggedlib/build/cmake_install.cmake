@@ -1,4 +1,4 @@
-# Install script for directory: /home/ubuntu/catkin_ws/src/legged_bot_hardware/src/leggedlib
+# Install script for directory: /home/nano/catkin_ws/install_isolated/share/legged_bot_hardware/src/leggedlib
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/ubuntu/catkin_ws/src/legged_bot_hardware/src/leggedlib/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/nano/catkin_ws/install_isolated/share/legged_bot_hardware/src/leggedlib/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

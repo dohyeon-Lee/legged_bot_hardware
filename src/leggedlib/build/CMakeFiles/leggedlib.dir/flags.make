@@ -6,5 +6,5 @@ CXX_FLAGS =
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/ubuntu/catkin_ws/src/legged_bot_hardware/src/leggedlib/include 
+CXX_INCLUDES = -I/home/nano/catkin_ws/install_isolated/share/legged_bot_hardware/src/leggedlib/include 
 

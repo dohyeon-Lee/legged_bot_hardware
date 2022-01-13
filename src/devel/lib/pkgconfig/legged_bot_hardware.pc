@@ -1,0 +1,8 @@
+prefix=/home/nano/catkin_ws/install_isolated/share/legged_bot_hardware/src/devel
+
+Name: legged_bot_hardware
+Description: Description of legged_bot_hardware
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib -llegged_bot_hardware
+Requires: roscpp rospy std_msgs rosserial_arduino rosserial_client tf genmsg

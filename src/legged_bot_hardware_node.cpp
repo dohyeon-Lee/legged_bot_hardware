@@ -80,7 +80,7 @@ int main(int argc, char **argv)
   vector<double> normal = {0,0.3,1}; //for plane & groundslope
 
   int data = 0;
-  double l = 0.18;
+  double l = 0.15;
   double before_l = l;
   vector<vector<double>> point;
   vector<double> origin = {0,0,1};
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
   int sleep_time = 10000;
 
   vector<vector<double>> pbefore = body.plane(origin, 0.13);
-  vector<vector<double>> pcurrent = body.plane(origin, 0.18);
+  vector<vector<double>> pcurrent = body.plane(origin, l);
   legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.stop(), pbefore, pcurrent);
 
   /*자율주행*/

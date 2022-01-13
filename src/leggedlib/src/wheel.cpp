@@ -78,6 +78,7 @@ void wheel::getodometry(double *Vx, double *Vy, double th)
 vector<int> wheel::movingwheel_slam()
 {
     double k = 10000*(10/15.);
+    //double k = 10000*(10/15.)*(1/5.); //0.5->0.1
     vector<int> speed;
     if(key[0] == 0.0 && key[1] == 0.0)
         speed = stop();
@@ -113,6 +114,18 @@ vector<int> wheel::movingwheel_slam()
                 speed = roundspin_bcw(-key[0]*k, r);
             }
         }
+        else if(key[0] == 0.0)
+        {
+            if(key[1] > 0)
+            {
+                speed = spin_ccw(key[1]*k*0.2*0.85);
+            }
+            else
+            {
+                speed = spin_cw(-key[1]*k*0.2*0.85);
+            }
+        }
+
     }
     return speed;
 }
