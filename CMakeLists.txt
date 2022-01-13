@@ -9,11 +9,13 @@ find_package(catkin REQUIRED COMPONENTS
   rosserial_arduino
   rosserial_client
   std_msgs
+  tf
+  genmsg
 )
 
 catkin_package(
   LIBRARIES legged_bot_hardware
-  CATKIN_DEPENDS roscpp rospy std_msgs rosserial_arduino rosserial_client
+  CATKIN_DEPENDS roscpp rospy std_msgs rosserial_arduino rosserial_client tf genmsg
   DEPENDS system_lib
 )
 

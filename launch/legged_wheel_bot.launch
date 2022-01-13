@@ -1,10 +1,12 @@
 <launch>
-  <group ns="ns1">
-    <node pkg="rosserial_python" type="serial_node.py" name="IMU" >
-    <param name="port" type="string" value="/dev/ttyACM0" />
-    <param name="baud" type="int" value="57600" />
-    </node>
-    <node pkg="legged_bot_hardware" type="legged_bot_hardware_node" name="hardware" />
-  </group>
-
+  <node pkg="rosserial_python" type="serial_node.py" name="IMU" >
+  <param name="port" type="string" value="/dev/ttyACM0" />
+  <param name="baud" type="int" value="57600" />
+  </node>
+  <node pkg="legged_bot_hardware" type="legged_bot_hardware_node" name="hardware" />
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping">
+      <remap from="scan" to="scan"/>
+  </node>
+  <include file="$(find ydlidar_ros)/launch/lidar_view.launch" />
+  <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="keyboard"/>
 </launch>

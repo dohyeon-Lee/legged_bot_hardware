@@ -65,10 +65,14 @@ class wheel
     vector<int> spin_ccw(int vel);
     vector<int> roundspin_cw(int vel, double r);
     vector<int> roundspin_ccw(int vel, double r);
+    vector<int> roundspin_bcw(int vel, double r);
+    vector<int> roundspin_bccw(int vel, double r);
     vector<int> stop();
     vector<int> rest(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *packetHandler, dynamixel::GroupSyncWrite groupSyncWrite);
     vector<int> on(dynamixel::PortHandler *portHandler, dynamixel::PacketHandler *packetHandler, dynamixel::GroupSyncWrite groupSyncWrite);
     vector<int> movingwheel(int vel);
+    void getodometry(double *Vx, double *Vy, double th);
+    vector<int> movingwheel_slam();
 };
 
 

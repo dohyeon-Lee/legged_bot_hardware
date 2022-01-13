@@ -1,6 +1,8 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/Twist.h>
+#include <nav_msgs/Odometry.h>
+#include <tf/transform_broadcaster.h> 
 
 #include <fcntl.h>
 #include <termios.h>
@@ -67,7 +69,7 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
   ros::Subscriber sub = nh.subscribe("cmd_vel", 1000, Callback_KEY);
   ros::Subscriber IMU = nh.subscribe("ANGLE",1000, Callback_IMU);
-
+ 
   //dynamixel setting
   dynamixel::PortHandler *portHandler = dynamixel::PortHandler::getPortHandler(DEVICENAME);
   dynamixel::PacketHandler *packetHandler = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION);
@@ -89,100 +91,134 @@ int main(int argc, char **argv)
   vector<vector<double>> pcurrent = body.plane(origin, 0.18);
   legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.stop(), pbefore, pcurrent);
 
-  /*balancing mode setting*/
-  legged_bot.setting(portHandler, packetHandler, groupSyncWrite);
-  
-  double angle_x;
-  double angle_y;
+  /*자율주행*/
+  ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
+  tf::TransformBroadcaster odom_broadcaster;
 
-  //PID control
-  double PID_x;
-  double PID_y;
-  act.groundslopePID_pre_setting();
-  // while(1)
+  ros::Time current_time, last_time;
+  current_time = ros::Time::now();
+  last_time = ros::Time::now();
+  ros::Rate r(100.0);
+
+  double Vx = 0;
+  double Vy = 0;
+  double w = 0;
+
+  double x = 0;
+  double y = 0;
+  double th = 0;
+
+  while(nh.ok())
+  {
+    ros::spinOnce();
+    current_time = ros::Time::now();
+    point = body.plane(origin, l);
+    double dt = (current_time - last_time).toSec();
+    legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point, W.movingwheel_slam());
+    w = W.key[1];
+    th = th + w*dt*0.3*1.2;
+    W.getodometry(&Vx, &Vy, th);
+    x = x + Vx*dt;
+    y = y + Vy*dt;
+    ROS_INFO("%5f, %5f, %5f",x, y, th*(180./M_PI));
+    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
+    geometry_msgs::TransformStamped odom_trans;
+    odom_trans.header.stamp = current_time;
+    odom_trans.header.frame_id = "odom";
+    odom_trans.child_frame_id = "base_link";
+
+    odom_trans.transform.translation.x = x;
+    odom_trans.transform.translation.y = y;
+    odom_trans.transform.translation.z = 0.0;
+    odom_trans.transform.rotation = odom_quat;
+
+    odom_broadcaster.sendTransform(odom_trans);
+
+    nav_msgs::Odometry odom;
+    odom.header.stamp = current_time;
+    odom.header.frame_id = "odom";
+
+    odom.pose.pose.position.x = x;
+    odom.pose.pose.position.y = y;
+    odom.pose.pose.position.z = 0.0;
+    odom.pose.pose.orientation = odom_quat;
+
+    odom.child_frame_id = "base_link";
+    odom.twist.twist.linear.x = Vx;
+    odom.twist.twist.linear.y = Vy;
+    odom.twist.twist.angular.z = w;
+
+    odom_pub.publish(odom);
+
+    last_time = current_time;
+    r.sleep();
+
+  }
+  ros::spin();
+
+  /*just keyboard control*/
+
+  // /*balancing mode setting*/
+  // legged_bot.setting(portHandler, packetHandler, groupSyncWrite);
+  
+  // double angle_x;
+  // double angle_y;
+
+  // //PID control
+  // double PID_x;
+  // double PID_y;
+  // act.groundslopePID_pre_setting(); 
+
+  // while(true)
   // {
+  //   vector<double> origin = {0,0,1};
   //   point = balancing(anglex, angley, angle_x, angle_y, l, &body, &act);
-  //   legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
+  //   if(W.key[1] != 0.0)
+  //   {
+  //     l = 0.14;
+  //     if(l != before_l)
+  //     {
+  //       l_state = 1;
+  //       vector<vector<double>> pointbefore = body.plane(origin, before_l);
+  //       vector<vector<double>> pointcurrent = body.plane(origin, l);
+  //       legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.stop(), pointbefore, pointcurrent);
+  //     }
+  //     else
+  //       l_state = 0;
+  //   }
+  //   else
+  //   {
+  //     l = 0.18;
+  //     if(l != before_l)
+  //     {
+  //       l_state = 1;
+  //       vector<vector<double>> pointbefore = body.plane(origin, before_l);
+  //       vector<vector<double>> pointcurrent = body.plane(origin, l);
+  //       legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.movingwheel(1023), pointbefore, pointcurrent);
+  //     }
+  //     else
+  //       l_state = 0;
+  //   }
+  //   if(W.key[2] == 0.0)
+  //   {
+  //     if(l_state == 0)
+  //     {//point = body.upstair1(origin,l, 0.055);
+        
+  //       legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point, W.movingwheel(1023));
+  //     }
+  //   }
+  //   else
+  //   {
+  //     upstair(portHandler, packetHandler, groupSyncWrite,l);
+  //   }
   //   usleep(sleep_time);
   //   ros::spinOnce();
+  //   before_l = l;
   // }
-  while(true)
-  {
-    vector<double> origin = {0,0,1};
-    point = balancing(anglex, angley, angle_x, angle_y, l, &body, &act);
-    if(W.key[1] != 0.0)
-    {
-      l = 0.14;
-      if(l != before_l)
-      {
-        l_state = 1;
-        vector<vector<double>> pointbefore = body.plane(origin, before_l);
-        vector<vector<double>> pointcurrent = body.plane(origin, l);
-        legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.stop(), pointbefore, pointcurrent);
-      }
-      else
-        l_state = 0;
-    }
-    else
-    {
-      l = 0.18;
-      if(l != before_l)
-      {
-        l_state = 1;
-        vector<vector<double>> pointbefore = body.plane(origin, before_l);
-        vector<vector<double>> pointcurrent = body.plane(origin, l);
-        legged_bot.smooth(portHandler, packetHandler, groupSyncWrite, W.movingwheel(1023), pointbefore, pointcurrent);
-      }
-      else
-        l_state = 0;
-    }
-    if(W.key[2] == 0.0)
-    {
-      if(l_state == 0)
-      {//point = body.upstair1(origin,l, 0.055);
-        
-        legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point, W.movingwheel(1023));
-      }
-    }
-    else
-    {
-      upstair(portHandler, packetHandler, groupSyncWrite,l);
-    }
-    usleep(sleep_time);
-    ros::spinOnce();
-    before_l = l;
-  }
 
-//   else if (getch() == 50){ //walking mode
-//     legged_bot.setting(portHandler, packetHandler, groupSyncWrite);
-//     /*
-//     double leg_term = ((act.point1[0]-act.point2[0])/2);
-//     double t_term = 0.001;
-//     double t1 = leg_term * 4;
-//     double t2 = leg_term * 2;
-//     double t3 = leg_term * 1;
-//     double t4 = leg_term * 3;
-// */
-//     double leg_term = ((act.point1[0]-act.point2[0])/3);
-//     double t_term = 0.0007; //0.001
-//     double t1 = leg_term * 0;
-//     double t2 = leg_term * 2;
-//     double t3 = leg_term * 1;
-//     double t4 = leg_term * 3;
 
-//     while(1)
-//     {
-//       //if (getch() == 119 || getch() == 87)
-//       t1 = t1 + t_term;
-//       t2 = t2 + t_term;
-//       t3 = t3 + t_term;
-//       t4 = t4 + t_term;
-//       point = act.forward(&t1, &t2, &t3, &t4);
-//       legged_bot.moving(portHandler, packetHandler, groupSyncWrite, point);
-//       usleep(sleep_time);
-//     }
 
-//   }
+
   
 //   else if (getch() == 51) //shacking mode
 //   {
@@ -422,20 +458,6 @@ vector<vector<double>> balancing(double &anglex, double &angley, double &angle_x
     angle_y = angley;
   }
 
-  // if(angle_y > limit_angle)
-  //   angle_y = limit_angle;
-  // else if(angle_y < -limit_angle)
-  //   angle_y = -limit_angle;
-  // else 
-  //   angle_y = angle_y;
-
-  // if(angle_x > limit_angle)
-  //   angle_x = limit_angle;
-  // else if(angle_x < -limit_angle)
-  //   angle_x = -limit_angle;
-  // else 
-  //   angle_x = angle_x;
-
   std::cout << angle_x <<","<< angle_y <<std::endl;
   vector<double> goal = {0,0};
   vector<double> PID = act->groundslopePID(goal, angle_x, angle_y);
@@ -487,4 +509,6 @@ void Callback_KEY(const geometry_msgs::Twist::ConstPtr& msg)
   W.key[0] = msg->linear.x;
   W.key[1] = msg->angular.z;
   W.key[2] = msg->linear.y;
+  //ROS_INFO("robot vx value: %f", W.key[0]);
+  //ROS_INFO("robt w value : %f", W.key[1]);
 }
